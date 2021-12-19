@@ -23,6 +23,7 @@ async function run() {
         const breakfastCollection = database.collection('breakfast')
         const launchCollection = database.collection('launch')
         const dinnerCollection = database.collection('dinner')
+        const ordersCollection = database.collection('orders')
 
         //get all blogs 
         app.get('/blogs', async (req, res) => {
@@ -56,6 +57,14 @@ async function run() {
             const cursor = dinnerCollection.find({})
             const result = await cursor.toArray()
             res.json(result)
+        })
+
+        // post order
+        app.post('/order', async (req, res) => {
+            const order = req.body;
+            const result = await ordersCollection.insertOne(order)
+            res.json(result)
+            console.log('this is result', result)
         })
 
     }
