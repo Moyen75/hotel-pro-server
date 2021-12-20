@@ -1,5 +1,6 @@
 const express = require('express')
 const app = express()
+const ObjectId = require('mongodb').ObjectId
 const port = process.env.PORT || 5000
 const cors = require('cors')
 const { MongoClient } = require('mongodb');
@@ -67,6 +68,22 @@ async function run() {
             console.log('this is result', result)
         })
 
+        // get specific user's order
+        app.get('/orders/:email', async (req, res) => {
+            const email = req.params.email;
+            const query = { userEmail: email }
+            const result = await ordersCollection.find(query).toArray()
+            res.json(result)
+            console.log(result);
+        })
+
+        // delete specific order
+        app.delete('/order/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) }
+            const result = await ordersCollection.deleteOne(query)
+            res.json(result)
+        })
     }
     finally {
         // await client.close()
