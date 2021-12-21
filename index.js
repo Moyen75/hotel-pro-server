@@ -25,6 +25,8 @@ async function run() {
         const launchCollection = database.collection('launch')
         const dinnerCollection = database.collection('dinner')
         const ordersCollection = database.collection('orders')
+        const reviewsCollection = database.collection('reviews')
+        const usersCollection = database.collection('users')
 
         //get all blogs 
         app.get('/blogs', async (req, res) => {
@@ -84,13 +86,48 @@ async function run() {
             const result = await ordersCollection.deleteOne(query)
             res.json(result)
         })
+
+        // add user feedback
+        app.post('/review', async (req, res) => {
+            const feedback = req.body;
+            const result = await reviewsCollection.insertOne(feedback)
+            res.json(result)
+            console.log(result)
+        })
+        // add user info to db
+        app.post('/user', async (req, res) => {
+            const user = req.body;
+            const result = await usersCollection.insertOne(user)
+            res.json(result)
+            console.log(user)
+        })
+        // upsert a user
+        app.put('/user', async (req, res) => {
+            const user = req.body;
+            const query = { email: user.email }
+            const update = {
+                $set: {
+                    email: user.email,
+                    displayName: user.displayName
+                }
+            }
+            const options = { upsert: true };
+            const result = await usersCollection.updateOne(query, update, options)
+            res.json(result)
+            console.log(result)
+        })
+        // get all users
+        app.get('/users', async (req, res) => {
+            const cursor = usersCollection.find({})
+            const result = await cursor.toArray()
+            res.json(result)
+        })
     }
     finally {
         // await client.close()
     }
 }
 run().catch(console.dir)
-
 
 app.get('/', (req, res) => {
     res.send('Hello from hotel pro')
